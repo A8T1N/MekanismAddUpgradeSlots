@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "mekanismaddupgradeslots.mixins",
+  "refmap": "mixins.mekanismaddupgradeslots.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    ""
+  ],
+  "client": [],
+  "server": []
+}
