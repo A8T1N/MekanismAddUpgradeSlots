@@ -5,7 +5,8 @@
   "refmap": "mixins.mekanismaddupgradeslots.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    ""
+    "MixinTileEntityWindGenerator",
+    "MixinGuiWindGenerator"
   ],
   "client": [],
   "server": []
