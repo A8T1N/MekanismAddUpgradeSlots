@@ -1,13 +1,14 @@
-package mekanismaddupgradeslots.mixins.generators.windgenerator;
+package mekanismaddupgradeslots.mixins.generator.windgenerator;
 
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.tile.component.TileComponentUpgrade;
+import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NonNullListSynchronized;
+import mekanism.generators.common.tile.TileEntityGenerator;
 import mekanism.generators.common.tile.TileEntityWindGenerator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,14 +17,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(TileEntityWindGenerator.class)
-public abstract class MixinTileEntityWindGenerator implements IUpgradeTile{
+public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator implements IUpgradeTile {
 
+    /* ==============================================
+     * アップグレードスロット関連メンバ・メソッド START
+     * ============================================== */
+
+    @Unique
+    private static final int[] SLOTS = {0, 1}; // スロット0: エネルギー, 1:アップグレード
     @Unique
     private TileComponentUpgrade upgradeComponent;
-    @Unique
-    private static final int[] SLOTS = {0, 1, 2}; // スロット0: エネルギー, 1,2: アップグレード
 
-//     コンストラクタでインベントリサイズを拡張し、TileComponentUpgradeを初期化
+    public MixinTileEntityWindGenerator(String soundPath, String name, double maxEnergy, double out) {
+        super(soundPath, name, maxEnergy, out);
+    }
+
+    // コンストラクタでインベントリサイズを拡張し、TileComponentUpgradeを初期化
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
         TileEntityWindGenerator tile = (TileEntityWindGenerator) (Object) this;
@@ -49,4 +58,21 @@ public abstract class MixinTileEntityWindGenerator implements IUpgradeTile{
     private void modifyGetSlotsForFace(EnumFacing side, CallbackInfoReturnable<int[]> cir) {
         cir.setReturnValue(SLOTS);
     }
+
+    /* ==============================================
+     * アップグレードスロット関連メンバ・メソッド END
+     * ============================================== */
+
+    /**
+     *  エネルギーアップグレード 対応
+     */
+    @Override
+    public void recalculateUpgradables(Upgrade upgrade) {
+        super.recalculateUpgradables(upgrade);
+        if (upgrade == Upgrade.ENERGY) {
+            maxEnergy = MekanismUtils.getMaxEnergy(this, BASE_MAX_ENERGY);
+            setEnergy(Math.min(getMaxEnergy(), getEnergy()));
+        }
+    }
+
 }
