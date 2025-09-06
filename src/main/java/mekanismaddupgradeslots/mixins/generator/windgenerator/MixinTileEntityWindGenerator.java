@@ -8,6 +8,7 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NonNullListSynchronized;
 import mekanism.generators.common.tile.TileEntityGenerator;
 import mekanism.generators.common.tile.TileEntityWindGenerator;
+import mekanismaddupgradeslots.MekanismAUSUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -82,52 +83,6 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
      *  スピードアップグレード 対応
      * ========================= */
 
-    /**
-     * インストールされている {@link Upgrade#SPEED} アップグレードの数に基づいて、
-     * 倍率を返します。
-     * <p>
-     * アップグレード段階と倍率の対応は以下の通りです:
-     * <pre>
-     * 0 -> 1.00x
-     * 1 -> 1.33x
-     * 2 -> 1.78x
-     * 3 -> 2.37x
-     * 4 -> 3.16x
-     * 5 -> 4.22x
-     * 6 -> 5.62x
-     * 7 -> 7.50x
-     * 8 -> 10.00x
-     * </pre>
-     * SPEED アップグレードがインストールされていない場合、または段階が範囲外の場合は、
-     * デフォルト値として {@code 1.0} を返します。
-     *
-     * @return 計算された速度倍率（最低でも {@code 1.0}）
-     */
-    public float Speed() {
-        if (!upgradeComponent.isUpgradeInstalled(Upgrade.SPEED)) {
-            return 1.0F;
-        }
-
-        int speed = upgradeComponent.getUpgrades(Upgrade.SPEED); // 0～8段階
-        float[] speedMultipliers = {
-                1.0F,   // 0段階
-                1.33F,  // 1段階
-                1.78F,  // 2段階
-                2.37F,  // 3段階
-                3.16F,  // 4段階
-                4.22F,  // 5段階
-                5.62F,  // 6段階
-                7.5F,   // 7段階
-                10.0F   // 8段階
-        };
-
-        if (speed < 0 || speed >= speedMultipliers.length) {
-            return 1.0F;
-        }
-
-        return speedMultipliers[speed];
-    }
-
     public float getMultiplier() {
         BlockPos top = this.getPos().up(4);
         if (this.world.canSeeSky(top)) {
@@ -140,7 +95,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
             float rangG = maxG < minG ? minG - maxG : maxG - minG;
             float slope = rangG / (float) rangeY;
             float toGen = minG + slope * (clampedY - (float) minY);
-            return toGen * Speed() / minG;
+            return toGen * MekanismAUSUtils.getMultiplier(Upgrade.SPEED,this.upgradeComponent) / minG;
         } else {
             return 0.0F;
         }
@@ -155,11 +110,9 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
 
     /**
      * WindGenerator の base 出力上限 (windGenerationMax * 2) に Speed() の倍率を掛けた値を返す。
-     * これによりアップグレードの枚数に応じて排出レートが上昇する。
      */
     @Override
     public double getMaxOutput() {
-        return MekanismConfig.current().generators.windGenerationMax.val() * 2.0 * Speed();
+        return MekanismConfig.current().generators.windGenerationMax.val() * 2.0 * MekanismAUSUtils.getMultiplier(Upgrade.ENERGY,this.upgradeComponent);
     }
-    
 }
