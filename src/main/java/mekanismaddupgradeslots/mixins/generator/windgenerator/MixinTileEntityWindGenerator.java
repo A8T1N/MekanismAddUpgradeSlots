@@ -24,6 +24,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
 
     // TODO
     //  Muffling Upgradeに対応
+    //  Multiplierによってプロペラの回転数を同期する。
     //  アップグレードGUIで戻るボタンが動作しない問題の修正 (GUI側の問題?)
 
     /* ==============================================
