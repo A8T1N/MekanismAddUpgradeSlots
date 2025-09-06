@@ -22,6 +22,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TileEntityWindGenerator.class)
 public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator implements IUpgradeTile {
 
+    // TODO
+    //  Muffling Upgradeに対応
+    //  アップグレードGUIで戻るボタンが動作しない問題の修正 (GUI側の問題?)
+
     /* ==============================================
      * アップグレードスロット関連メンバ・メソッド START
      * ============================================== */
@@ -29,13 +33,15 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     @Unique
     private static final int[] SLOTS = {0, 1}; // スロット0: エネルギー, 1:アップグレード
     @Unique
-    private TileComponentUpgrade upgradeComponent;
+    private TileComponentUpgrade upgradeComponent; // アップグレードを追加するクラス
 
+    // TileEntityGeneratorを継承したためコンストラクタを作成 意味は無い
     public MixinTileEntityWindGenerator(String soundPath, String name, double maxEnergy, double out) {
         super(soundPath, name, maxEnergy, out);
     }
 
     // コンストラクタでインベントリサイズを拡張し、TileComponentUpgradeを初期化
+    // SPEED,ENERGYアップグレードに対応
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
         TileEntityWindGenerator self = (TileEntityWindGenerator) (Object) this;
@@ -50,13 +56,20 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
         upgradeComponent.setSupported(Upgrade.ENERGY);
     }
 
-    // IUpgradeTileの必須メソッド: アップグレードコンポーネントを返す
+    /**
+     * IUpgradeTileの必須メソッド: アップグレードコンポーネントを返す
+     */
     @Override
     public TileComponentUpgrade getComponent() {
         return upgradeComponent;
     }
 
-    // getSlotsForFaceをオーバーライドしてアップグレードスロットを扱う
+    /**
+     * インベントリスロット拡張のための Mixin:<br></br>
+     * 元の TileEntity は SLOTS = {0} のみを返すが、
+     * アップグレードスロットを追加したため {0, 1} を返すように差し替える。
+     * getSlotsForFace の戻り値を強制的に上書き。
+     */
     @Inject(method = "getSlotsForFace", at = @At("HEAD"), cancellable = true)
     private void modifyGetSlotsForFace(EnumFacing side, CallbackInfoReturnable<int[]> cir) {
         cir.setReturnValue(SLOTS);
@@ -65,6 +78,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     /* ==============================================
      * アップグレードスロット関連メンバ・メソッド END
      * ============================================== */
+
 
     /*　=========================
      * エネルギーアップグレード 対応
@@ -83,6 +97,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
      *  スピードアップグレード 対応
      * ========================= */
 
+    // 最終倍率にアップグレードのインストール数に基づいた倍率を掛ける。
     public float getMultiplier() {
         BlockPos top = this.getPos().up(4);
         if (this.world.canSeeSky(top)) {
@@ -95,7 +110,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
             float rangG = maxG < minG ? minG - maxG : maxG - minG;
             float slope = rangG / (float) rangeY;
             float toGen = minG + slope * (clampedY - (float) minY);
-            return toGen * MekanismAUSUtils.getMultiplier(Upgrade.SPEED,this.upgradeComponent) / minG;
+            return toGen * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent) / minG;
         } else {
             return 0.0F;
         }
@@ -113,6 +128,6 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
      */
     @Override
     public double getMaxOutput() {
-        return MekanismConfig.current().generators.windGenerationMax.val() * 2.0 * MekanismAUSUtils.getMultiplier(Upgrade.ENERGY,this.upgradeComponent);
+        return MekanismConfig.current().generators.windGenerationMax.val() * 2.0 * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent);
     }
 }

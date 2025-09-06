@@ -27,7 +27,7 @@ public final class MekanismAUSUtils {
      *
      * @return 計算された速度倍率（最低でも {@code 1.0}）
      */
-    public  static float getMultiplier(Upgrade type,TileComponentUpgrade upgradeComponent) {
+    public  static float getUpgradeMultiplier(Upgrade type,TileComponentUpgrade upgradeComponent) {
         if (!upgradeComponent.isUpgradeInstalled(type)) {
             return 1.0F;
         }
