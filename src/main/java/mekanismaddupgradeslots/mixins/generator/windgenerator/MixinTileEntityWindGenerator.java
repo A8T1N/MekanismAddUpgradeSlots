@@ -37,14 +37,14 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     // コンストラクタでインベントリサイズを拡張し、TileComponentUpgradeを初期化
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
-        TileEntityWindGenerator tile = (TileEntityWindGenerator) (Object) this;
+        TileEntityWindGenerator self = (TileEntityWindGenerator) (Object) this;
         // インベントリを拡張（サイズ3: スロット0=エネルギー, 1,2=アップグレード）
         NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(SLOTS.length, ItemStack.EMPTY);
         // 既存のスロット0のアイテムをコピー
-        newInventory.set(0, tile.inventory.get(0));
-        tile.inventory = newInventory;
+        newInventory.set(0, self.inventory.get(0));
+        self.inventory = newInventory;
         // TileComponentUpgradeをスロットID 1で初期化
-        upgradeComponent = new TileComponentUpgrade(tile, 1);
+        upgradeComponent = new TileComponentUpgrade(self, 1);
         upgradeComponent.setSupported(Upgrade.SPEED);
         upgradeComponent.setSupported(Upgrade.ENERGY);
     }
@@ -65,9 +65,9 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
      * アップグレードスロット関連メンバ・メソッド END
      * ============================================== */
 
-    /**
+    /*　=========================
      * エネルギーアップグレード 対応
-     */
+     *  ======================== */
     @Override
     public void recalculateUpgradables(Upgrade upgrade) {
         super.recalculateUpgradables(upgrade);
@@ -78,10 +78,31 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     }
 
 
-    /**
+    /* =========================
      *  スピードアップグレード 対応
-     */
+     * ========================= */
 
+    /**
+     * インストールされている {@link Upgrade#SPEED} アップグレードの数に基づいて、
+     * 倍率を返します。
+     * <p>
+     * アップグレード段階と倍率の対応は以下の通りです:
+     * <pre>
+     * 0 -> 1.00x
+     * 1 -> 1.33x
+     * 2 -> 1.78x
+     * 3 -> 2.37x
+     * 4 -> 3.16x
+     * 5 -> 4.22x
+     * 6 -> 5.62x
+     * 7 -> 7.50x
+     * 8 -> 10.00x
+     * </pre>
+     * SPEED アップグレードがインストールされていない場合、または段階が範囲外の場合は、
+     * デフォルト値として {@code 1.0} を返します。
+     *
+     * @return 計算された速度倍率（最低でも {@code 1.0}）
+     */
     public float Speed() {
         if (!upgradeComponent.isUpgradeInstalled(Upgrade.SPEED)) {
             return 1.0F;
@@ -124,4 +145,21 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
             return 0.0F;
         }
     }
+
+
+    /*
+     * =========================================
+     * スピードアップグレードによる排出RF量の動的変更
+     * =========================================
+     */
+
+    /**
+     * WindGenerator の base 出力上限 (windGenerationMax * 2) に Speed() の倍率を掛けた値を返す。
+     * これによりアップグレードの枚数に応じて排出レートが上昇する。
+     */
+    @Override
+    public double getMaxOutput() {
+        return MekanismConfig.current().generators.windGenerationMax.val() * 2.0 * Speed();
+    }
+    
 }
