@@ -6,7 +6,9 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "generator.windgenerator.MixinTileEntityWindGenerator",
-    "generator.windgenerator.MixinGuiWindGenerator"
+    "generator.windgenerator.MixinGuiWindGenerator",
+    "generator.heatgenerator.MixinTileEntityHeatGenerator",
+    "generator.heatgenerator.MixinGuiHeatGenerator"
   ],
   "client": [],
   "server": []
