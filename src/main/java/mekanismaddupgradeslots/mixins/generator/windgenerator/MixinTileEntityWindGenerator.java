@@ -27,9 +27,6 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     //  Multiplierによってプロペラの回転数を同期する。
     //  アップグレードGUIで戻るボタンが動作しない問題の修正 (GUI側の問題?)
 
-    /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド START
-     * ============================================== */
 
     @Unique
     private static final int[] SLOTS = {0, 1}; // スロット0: エネルギー, 1:アップグレード
@@ -40,6 +37,10 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     public MixinTileEntityWindGenerator(String soundPath, String name, double maxEnergy, double out) {
         super(soundPath, name, maxEnergy, out);
     }
+
+    /* ==============================================
+     * アップグレードスロット関連メンバ・メソッド START
+     * ============================================== */
 
     // コンストラクタでインベントリサイズを拡張し、TileComponentUpgradeを初期化
     // SPEED,ENERGYアップグレードに対応
@@ -120,7 +121,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
 
     /*
      * =========================================
-     * スピードアップグレードによる排出RF量の動的変更
+     * エネルギーアップグレードによる排出RF量の動的変更
      * =========================================
      */
 
@@ -131,4 +132,5 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     public double getMaxOutput() {
         return MekanismConfig.current().generators.windGenerationMax.val() * 2.0 * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent);
     }
+
 }

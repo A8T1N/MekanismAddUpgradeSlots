@@ -1,7 +1,5 @@
 package mekanismaddupgradeslots;
 
-import mekanism.client.gui.GuiElectricPump;
-import mekanism.common.tile.machine.TileEntityElectricPump;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
