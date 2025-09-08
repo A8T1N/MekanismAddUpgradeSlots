@@ -8,7 +8,9 @@
     "generator.windgenerator.MixinTileEntityWindGenerator",
     "generator.windgenerator.MixinGuiWindGenerator",
     "generator.heatgenerator.MixinTileEntityHeatGenerator",
-    "generator.heatgenerator.MixinGuiHeatGenerator"
+    "generator.heatgenerator.MixinGuiHeatGenerator",
+    "generator.biogenerator.MixinGuiBioGenerator",
+    "generator.biogenerator.MixinTileEntityBioGenerator"
   ],
   "client": [],
   "server": []
