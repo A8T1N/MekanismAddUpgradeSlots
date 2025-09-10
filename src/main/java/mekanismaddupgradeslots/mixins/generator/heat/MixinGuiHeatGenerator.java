@@ -1,4 +1,4 @@
-package mekanismaddupgradeslots.mixins.generator.heatgenerator;
+package mekanismaddupgradeslots.mixins.generator.heat;
 
 import mekanism.client.gui.GuiMekanismTile;
 import mekanism.client.gui.element.tab.GuiUpgradeTab;

@@ -1,47 +1,45 @@
-package mekanismaddupgradeslots.mixins.generator.heatgenerator;
+package mekanismaddupgradeslots.mixins.generator.bio;
 
+import mekanism.common.FluidSlot;
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.component.TileComponentUpgrade;
-import mekanism.common.util.HeatUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NonNullListSynchronized;
+import mekanism.generators.common.tile.TileEntityBioGenerator;
 import mekanism.generators.common.tile.TileEntityGenerator;
-import mekanism.generators.common.tile.TileEntityHeatGenerator;
 import mekanismaddupgradeslots.MekanismAUSUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidTank;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
 
-@Mixin(TileEntityHeatGenerator.class)
-public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator implements IUpgradeTile {
+@Mixin(TileEntityBioGenerator.class)
+public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator implements IUpgradeTile {
     @Shadow
-    public FluidTank lavaTank;
-    @Shadow
-    public double thermalEfficiency;
+    public FluidSlot bioFuelSlot;
     @Unique
     private TileComponentUpgrade upgradeComponent; // アップグレードを追加するクラス
-
-    public MixinTileEntityHeatGenerator(String soundPath, String name, double maxEnergy, double out) {
-        super(soundPath, name, maxEnergy, out);
-    }
 
     /* ==============================================
      * アップグレードスロット関連メンバ・メソッド START
      * ============================================== */
 
+    public MixinTileEntityBioGenerator(String soundPath, String name, double maxEnergy, double out) {
+        super(soundPath, name, maxEnergy, out);
+    }
+
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
-        TileEntityHeatGenerator self = (TileEntityHeatGenerator) (Object) this;
+        TileEntityBioGenerator self = (TileEntityBioGenerator) (Object) this;
         NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(3, ItemStack.EMPTY);
         newInventory.set(0, self.inventory.get(0));
         newInventory.set(1, self.inventory.get(1));
@@ -59,6 +57,13 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
         return upgradeComponent;
     }
 
+    /* ==============================================
+     * アップグレードスロット関連メンバ・メソッド END
+     * ============================================== */
+
+    /*　=========================
+     * エネルギーアップグレード 対応
+     *  ======================== */
 
     @Nonnull
     @Override
@@ -70,14 +75,10 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
         return new int[]{0, 2};
     }
 
-    /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド END
-     * ============================================== */
+    /* =========================
+     *  スピードアップグレード 対応
+     * ========================= */
 
-
-    /*　=========================
-     * エネルギーアップグレード 対応
-     *  ======================== */
     @Override
     public void recalculateUpgradables(Upgrade upgrade) {
         super.recalculateUpgradables(upgrade);
@@ -87,37 +88,22 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
         }
     }
 
-    /* =========================
-     *  スピードアップグレード 対応
-     * ========================= */
-
     // 発電動作条件にエネルギーアップグレードを対応
-    @Override
     public boolean canOperate() {
-        return this.electricityStored.get() < this.BASE_MAX_ENERGY * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent) && this.lavaTank.getFluid() != null && this.lavaTank.getFluid().amount >= 10 && MekanismUtils.canFunction(this);
+        return this.electricityStored.get() < this.BASE_MAX_ENERGY * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent) && this.bioFuelSlot.fluidStored > 0 && MekanismUtils.canFunction(this);
     }
 
-    @Shadow
-    public double getTemp() {
-        return 0;
-    }
-
-    @Shadow
-    public void transferHeatTo(double heat) {
-
-    }
-
-    public double[] simulateHeat() {
-        TileEntityHeatGenerator self = (TileEntityHeatGenerator) (Object) this;
-        if (this.getTemp() > 0.0) {
-            double carnotEfficiency = this.getTemp() / (this.getTemp() + 300.0);
-            double heatLost = this.thermalEfficiency * this.getTemp();
-            double workDone = heatLost * carnotEfficiency * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent);
-            this.transferHeatTo(-heatLost);
-            this.setEnergy(this.getEnergy() + workDone);
-        }
-
-        return HeatUtils.simulate(self);
+    @Redirect(
+            method = "onAsyncUpdateServer",
+            at = @At(
+                    value = "INVOKE",
+                    // owner は実際に呼ばれている owner に合わせてください（下の例は元と同じならOK）
+                    target = "Lmekanism/generators/common/tile/TileEntityBioGenerator;setEnergy(D)V"
+            )
+    )
+    private void redirectSetEnergy(TileEntityBioGenerator instance, double originalArg) {
+        originalArg = this.electricityStored.get() + MekanismConfig.current().generators.bioGeneration.val() * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent);
+        instance.setEnergy(originalArg);
     }
 
 
@@ -129,7 +115,7 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
 
     @Override
     public double getMaxOutput() {
-        return MekanismConfig.current().generators.heatGeneration.val() * 2.0 * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent);
+        return MekanismConfig.current().generators.bioGeneration.val() * 2.0 * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent);
     }
 
 }

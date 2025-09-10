@@ -1,4 +1,4 @@
-package mekanismaddupgradeslots.mixins.generator.windgenerator;
+package mekanismaddupgradeslots.mixins.generator.wind;
 
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
