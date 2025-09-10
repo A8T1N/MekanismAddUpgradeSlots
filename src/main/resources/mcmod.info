@@ -1,12 +1,12 @@
 [{
     "modid": "${modid}",
     "name": "${modname}",
-    "description": "An example mod for Minecraft 1.12.2 with Forge",
+    "description": "Adds upgrade slots to Mekanism machines that originally lack them.",
     "version": "${version}",
     "mcversion": "${mcversion}",
-    "logoFile": "",
+    "logoFile": "assets/mekanismaddupgradeslots/logo.png",
     "url": "",
-    "authorList": [],
+    "authorList": ["A8"],
     "credits": "",
     "dependencies": []
 }]
