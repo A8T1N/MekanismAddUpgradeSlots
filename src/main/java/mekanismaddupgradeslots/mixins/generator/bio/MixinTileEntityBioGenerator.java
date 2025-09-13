@@ -29,13 +29,13 @@ public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator im
     @Unique
     private TileComponentUpgrade upgradeComponent; // アップグレードを追加するクラス
 
-    /* ==============================================
-     * アップグレードスロット関連
-     * ============================================== */
-
     public MixinTileEntityBioGenerator(String soundPath, String name, double maxEnergy, double out) {
         super(soundPath, name, maxEnergy, out);
     }
+
+    /* ==============================================
+     * アップグレードスロット関連
+     * ============================================== */
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
@@ -103,11 +103,9 @@ public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator im
         instance.setEnergy(originalArg);
     }
 
-    /*
-     * =========================================
+    /*===========================================
      * エネルギーアップグレードによる排出RF量の動的変更
-     * =========================================
-     */
+     * ========================================== */
 
     @Override
     public double getMaxOutput() {

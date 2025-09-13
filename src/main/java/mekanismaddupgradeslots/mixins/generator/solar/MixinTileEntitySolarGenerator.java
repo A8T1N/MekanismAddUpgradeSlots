@@ -94,14 +94,12 @@ public abstract class MixinTileEntitySolarGenerator extends TileEntityGenerator 
         return String.format("%2.0f", (getProduction() / getMaxOutput()) * 100);
     }
 
-    /*
-     * =========================================
+    /* ==============================================
      * エネルギーアップグレードによる排出RF量の動的変更
-     * =========================================
-     */
+     * ============================================== */
 
     @Override
     public double getMaxOutput() {
-        return  MekanismConfig.current().generators.solarGeneration.val() * 2 * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent);
+        return MekanismConfig.current().generators.solarGeneration.val() * 2 * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent);
     }
 }

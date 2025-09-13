@@ -39,7 +39,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     }
 
     /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド START
+     * アップグレードスロット関連
      * ============================================== */
 
     // コンストラクタでインベントリサイズを拡張し、TileComponentUpgradeを初期化
@@ -77,14 +77,10 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
         cir.setReturnValue(SLOTS);
     }
 
-    /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド END
-     * ============================================== */
-
-
     /*　=========================
      * エネルギーアップグレード 対応
      *  ======================== */
+
     @Override
     public void recalculateUpgradables(Upgrade upgrade) {
         super.recalculateUpgradables(upgrade);
@@ -93,7 +89,6 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
             setEnergy(Math.min(getMaxEnergy(), getEnergy()));
         }
     }
-
 
     /* =========================
      *  スピードアップグレード 対応
@@ -117,7 +112,6 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
             return 0.0F;
         }
     }
-
 
     /*
      * =========================================

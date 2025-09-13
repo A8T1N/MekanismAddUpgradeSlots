@@ -13,8 +13,8 @@
     "generator.bio.MixinGuiBioGenerator",
     "generator.gas.MixinTileEntityGasGenerator",
     "generator.gas.MixinGuiGasGenerator",
-    "generator.solar.MixinGuiSolarGenerator",
-    "generator.solar.MixinTileEntitySolarGenerator"
+    "generator.solar.MixinTileEntitySolarGenerator",
+    "generator.solar.MixinGuiSolarGenerator"
   ],
   "client": [],
   "server": []

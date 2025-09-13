@@ -29,19 +29,14 @@ public abstract class MixinTileEntityGasGenerator extends TileEntityGenerator im
     public double generationRate;
     private TileComponentUpgrade upgradeComponent;
 
-
     public MixinTileEntityGasGenerator(String soundPath, String name, double maxEnergy, double out) {
         super(soundPath, name, maxEnergy, out);
-    }
-
-    @Shadow
-    public int getToUse() {
-        return 0;
     }
 
     /* ==============================================
      * アップグレードスロット関連
      * ============================================== */
+
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
         TileEntityGasGenerator self = (TileEntityGasGenerator) (Object) this;
@@ -71,6 +66,7 @@ public abstract class MixinTileEntityGasGenerator extends TileEntityGenerator im
     /* ==============================================
      * エネルギーアップグレード対応
      * ============================================== */
+
     @Override
     public void recalculateUpgradables(Upgrade upgrade) {
         super.recalculateUpgradables(upgrade);
@@ -83,6 +79,7 @@ public abstract class MixinTileEntityGasGenerator extends TileEntityGenerator im
     /* ==============================================
      * スピードアップグレード対応
      * ============================================== */
+
     @Redirect(
             method = "onAsyncUpdateServer",
             at = @At(

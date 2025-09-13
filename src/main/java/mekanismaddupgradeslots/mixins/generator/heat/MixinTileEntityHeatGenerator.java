@@ -36,7 +36,7 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
     }
 
     /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド START
+     * アップグレードスロット関連
      * ============================================== */
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -69,11 +69,6 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
         // それ以外の面からはスロット0と2 アップグレードスロット
         return new int[]{0, 2};
     }
-
-    /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド END
-     * ============================================== */
-
 
     /*　=========================
      * エネルギーアップグレード 対応
@@ -120,12 +115,9 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
         return HeatUtils.simulate(self);
     }
 
-
-    /*
-     * =========================================
+    /* ==============================================
      * エネルギーアップグレードによる排出RF量の動的変更
-     * =========================================
-     */
+     * ============================================== */
 
     @Override
     public double getMaxOutput() {
