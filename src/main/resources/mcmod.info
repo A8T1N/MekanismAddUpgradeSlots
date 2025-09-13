@@ -1,4 +1,5 @@
-[{
+[
+  {
     "modid": "${modid}",
     "name": "${modname}",
     "description": "Adds upgrade slots to Mekanism machines that originally lack them.",
@@ -6,7 +7,10 @@
     "mcversion": "${mcversion}",
     "logoFile": "assets/mekanismaddupgradeslots/logo.png",
     "url": "",
-    "authorList": ["A8"],
+    "authorList": [
+      "A8"
+    ],
     "credits": "",
     "dependencies": []
-}]
+  }
+]

@@ -30,7 +30,7 @@ public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator im
     private TileComponentUpgrade upgradeComponent; // アップグレードを追加するクラス
 
     /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド START
+     * アップグレードスロット関連
      * ============================================== */
 
     public MixinTileEntityBioGenerator(String soundPath, String name, double maxEnergy, double out) {
@@ -57,14 +57,6 @@ public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator im
         return upgradeComponent;
     }
 
-    /* ==============================================
-     * アップグレードスロット関連メンバ・メソッド END
-     * ============================================== */
-
-    /*　=========================
-     * エネルギーアップグレード 対応
-     *  ======================== */
-
     @Nonnull
     @Override
     public int[] getSlotsForFace(@Nonnull EnumFacing side) {
@@ -75,9 +67,9 @@ public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator im
         return new int[]{0, 2};
     }
 
-    /* =========================
-     *  スピードアップグレード 対応
-     * ========================= */
+    /*　=========================
+     * エネルギーアップグレード 対応
+     *  ======================== */
 
     @Override
     public void recalculateUpgradables(Upgrade upgrade) {
@@ -88,6 +80,10 @@ public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator im
         }
     }
 
+    /* =========================
+     *  スピードアップグレード 対応
+     * ========================= */
+
     // 発電動作条件にエネルギーアップグレードを対応
     public boolean canOperate() {
         return this.electricityStored.get() < this.BASE_MAX_ENERGY * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent) && this.bioFuelSlot.fluidStored > 0 && MekanismUtils.canFunction(this);
@@ -97,15 +93,15 @@ public abstract class MixinTileEntityBioGenerator extends TileEntityGenerator im
             method = "onAsyncUpdateServer",
             at = @At(
                     value = "INVOKE",
-                    // owner は実際に呼ばれている owner に合わせてください（下の例は元と同じならOK）
                     target = "Lmekanism/generators/common/tile/TileEntityBioGenerator;setEnergy(D)V"
             )
     )
     private void redirectSetEnergy(TileEntityBioGenerator instance, double originalArg) {
-        originalArg = this.electricityStored.get() + MekanismConfig.current().generators.bioGeneration.val() * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent);
+        originalArg = instance.electricityStored.get()
+                + MekanismConfig.current().generators.bioGeneration.val()
+                * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent);
         instance.setEnergy(originalArg);
     }
-
 
     /*
      * =========================================
