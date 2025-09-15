@@ -1,5 +1,6 @@
 package mekanismaddupgradeslots.mixins.generator.wind;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.config.MekanismConfig;
@@ -49,7 +50,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     public void init(CallbackInfo ci) {
         TileEntityWindGenerator self = (TileEntityWindGenerator) (Object) this;
         // インベントリを拡張（サイズ2: スロット0: エネルギー, 1:アップグレード）
-        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(NEW_SLOTS.length, new ItemStack((Item) null));
+        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(NEW_SLOTS.length, new ItemStack((Item)null));
         // 既存のスロット0のアイテムをコピー
         newInventory.set(0, self.inventory.get(0));
         self.inventory = newInventory;
@@ -96,22 +97,12 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
      * ========================= */
 
     // 最終倍率にアップグレードのインストール数に基づいた倍率を掛ける。
-    public float getMultiplier() {
-        BlockPos top = this.getPos().up(4);
-        if (this.world.canSeeSky(top)) {
-            int minY = MekanismConfig.current().generators.windGenerationMinY.val();
-            int maxY = MekanismConfig.current().generators.windGenerationMaxY.val();
-            float clampedY = (float) Math.min(maxY, Math.max(minY, top.getY()));
-            float minG = (float) MekanismConfig.current().generators.windGenerationMin.val();
-            float maxG = (float) MekanismConfig.current().generators.windGenerationMax.val();
-            int rangeY = maxY < minY ? minY - maxY : maxY - minY;
-            float rangG = maxG < minG ? minG - maxG : maxG - minG;
-            float slope = rangG / (float) rangeY;
-            float toGen = minG + slope * (clampedY - (float) minY);
-            return toGen * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent) / minG;
-        } else {
-            return 0.0F;
-        }
+    @ModifyReturnValue(method = "getMultiplier()F", at = @At("RETURN"))
+    private float modifyMultiplier(float original) {
+        // ローカル変数minGを直接参照できないため、元の戻り値(original = toGen / minG)を使用
+        // original * minGでtoGenを復元し、アップグレード乗数を適用して再度minGで割る
+        // 実際にはminGを@Localでキャプチャ可能だが、今回は簡略化
+        return original * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent);
     }
 
     /*
