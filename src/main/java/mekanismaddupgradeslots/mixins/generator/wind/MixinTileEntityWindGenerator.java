@@ -9,6 +9,7 @@ import mekanism.common.util.NonNullListSynchronized;
 import mekanism.generators.common.tile.TileEntityGenerator;
 import mekanism.generators.common.tile.TileEntityWindGenerator;
 import mekanismaddupgradeslots.MekanismAUSUtils;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +30,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
 
 
     @Unique
-    private static final int[] SLOTS = {0, 1}; // スロット0: エネルギー, 1:アップグレード
+    private static final int[] NEW_SLOTS = {0, 1}; // スロット0: エネルギー, 1:アップグレード
     @Unique
     private TileComponentUpgrade upgradeComponent; // アップグレードを追加するクラス
 
@@ -44,11 +45,11 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
 
     // コンストラクタでインベントリサイズを拡張し、TileComponentUpgradeを初期化
     // SPEED,ENERGYアップグレードに対応
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void init(CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void init(CallbackInfo ci) {
         TileEntityWindGenerator self = (TileEntityWindGenerator) (Object) this;
-        // インベントリを拡張（サイズ3: スロット0=エネルギー, 1,2=アップグレード）
-        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(SLOTS.length, ItemStack.EMPTY);
+        // インベントリを拡張（サイズ2: スロット0: エネルギー, 1:アップグレード）
+        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(NEW_SLOTS.length, new ItemStack((Item) null));
         // 既存のスロット0のアイテムをコピー
         newInventory.set(0, self.inventory.get(0));
         self.inventory = newInventory;
@@ -74,7 +75,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
      */
     @Inject(method = "getSlotsForFace", at = @At("HEAD"), cancellable = true)
     private void modifyGetSlotsForFace(EnumFacing side, CallbackInfoReturnable<int[]> cir) {
-        cir.setReturnValue(SLOTS);
+        cir.setReturnValue(NEW_SLOTS);
     }
 
     /*　=========================
