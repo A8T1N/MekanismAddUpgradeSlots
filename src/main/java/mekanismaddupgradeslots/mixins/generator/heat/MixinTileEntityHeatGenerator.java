@@ -10,6 +10,7 @@ import mekanism.common.util.NonNullListSynchronized;
 import mekanism.generators.common.tile.TileEntityGenerator;
 import mekanism.generators.common.tile.TileEntityHeatGenerator;
 import mekanismaddupgradeslots.MekanismAUSUtils;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidTank;
@@ -42,7 +43,7 @@ public abstract class MixinTileEntityHeatGenerator extends TileEntityGenerator i
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
         TileEntityHeatGenerator self = (TileEntityHeatGenerator) (Object) this;
-        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(3, ItemStack.EMPTY);
+        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(3, new ItemStack((Item)null));
         newInventory.set(0, self.inventory.get(0));
         newInventory.set(1, self.inventory.get(1));
         self.inventory = newInventory;

@@ -9,6 +9,7 @@ import mekanism.common.util.NonNullListSynchronized;
 import mekanism.generators.common.tile.TileEntityGenerator;
 import mekanism.generators.common.tile.TileEntitySolarGenerator;
 import mekanismaddupgradeslots.MekanismAUSUtils;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,7 +38,7 @@ public abstract class MixinTileEntitySolarGenerator extends TileEntityGenerator 
     @Inject(method = "<init>(Ljava/lang/String;DD)V", at = @At("TAIL"))
     private void init(String name, double maxEnergy, double output, CallbackInfo ci) {
         TileEntitySolarGenerator self = (TileEntitySolarGenerator) (Object) this;
-        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(2, ItemStack.EMPTY);
+        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(2,  new ItemStack((Item)null));
         newInventory.set(0, self.inventory.get(0));
         self.inventory = newInventory;
         upgradeComponent = new TileComponentUpgrade(self, 1);
