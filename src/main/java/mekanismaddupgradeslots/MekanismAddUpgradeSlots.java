@@ -1,5 +1,6 @@
 package mekanismaddupgradeslots;
 
+import mekanismaddupgradeslots.config.ConfigHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
@@ -26,6 +27,7 @@ public class MekanismAddUpgradeSlots {
         // register to the event bus so that we can listen to events
         MinecraftForge.EVENT_BUS.register(this);
         LOGGER.info("I am " + Tags.MODNAME + " + at version " + Tags.VERSION);
+        ConfigHandler.init(event.getSuggestedConfigurationFile());
     }
 
     @SubscribeEvent

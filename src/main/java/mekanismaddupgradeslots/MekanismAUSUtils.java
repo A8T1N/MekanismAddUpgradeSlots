@@ -2,6 +2,7 @@ package mekanismaddupgradeslots;
 
 import mekanism.common.Upgrade;
 import mekanism.common.tile.component.TileComponentUpgrade;
+import mekanismaddupgradeslots.config.ConfigHandler;
 
 public final class MekanismAUSUtils {
     private MekanismAUSUtils() {
@@ -25,6 +26,8 @@ public final class MekanismAUSUtils {
      * </pre>
      * アップグレードがインストールされていない場合、または段階が範囲外の場合は、
      * デフォルト値として {@code 1.0} を返します。
+     * <p>
+     * MekanismTweaksMode（設定ファイルで変更可能、デフォルトはFalse）が有効時、9以上で10.0xのべき乗を適用。
      *
      * @return 計算された速度倍率（最低でも {@code 1.0}）
      */
@@ -46,11 +49,9 @@ public final class MekanismAUSUtils {
                 10.0F   // インストール数 : 8
         };
 
-        if (installCount < 0 || installCount >= multipliers.length) {
-            return 1.0F;
-        }
-
-        return multipliers[installCount];
+        return ConfigHandler.MekanismTweaksMode && installCount >= 9
+                ? (float) Math.pow(10.0, installCount / 8) * multipliers[installCount % 8]
+                : multipliers[Math.min(installCount, 8)];
     }
 
 }
