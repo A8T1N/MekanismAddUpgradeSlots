@@ -14,7 +14,13 @@
     "generator.gas.MixinTileEntityGasGenerator",
     "generator.gas.MixinGuiGasGenerator",
     "generator.solar.MixinTileEntitySolarGenerator",
-    "generator.solar.MixinGuiSolarGenerator"
+    "generator.solar.MixinGuiSolarGenerator",
+    "laser.amplifier.MixinTileEntityLaserAmplifier",
+    "laser.amplifier.MixinGuiLaserAmplifier",
+    "laser.tractorbeam.MixinTileEntityLaserTractorBeam",
+    "laser.tractorbeam.MixinGuiLaserTractorBeam"
+
+
   ],
   "client": [],
   "server": []
