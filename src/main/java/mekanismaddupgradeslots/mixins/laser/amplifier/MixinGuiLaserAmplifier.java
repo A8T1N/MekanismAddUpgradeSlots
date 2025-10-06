@@ -44,7 +44,7 @@ public class MixinGuiLaserAmplifier extends GuiMekanismTile<TileEntityLaserAmpli
             )
     )
     private double redirectGetMaxLevel(GuiNumberGauge.INumberInfoHandler handler) {
-        return ((TileEntityLaserAmplifier) this.tileEntity).getMaxEnergy();
+        return this.tileEntity.getMaxEnergy();
     }
 
 }

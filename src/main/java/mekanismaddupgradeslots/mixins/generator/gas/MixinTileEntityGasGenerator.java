@@ -41,7 +41,7 @@ public abstract class MixinTileEntityGasGenerator extends TileEntityGenerator im
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
         TileEntityGasGenerator self = (TileEntityGasGenerator) (Object) this;
-        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(3,  new ItemStack((Item)null));
+        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(3, new ItemStack((Item) null));
         newInventory.set(0, self.inventory.get(0));
         newInventory.set(1, self.inventory.get(1));
         self.inventory = newInventory;

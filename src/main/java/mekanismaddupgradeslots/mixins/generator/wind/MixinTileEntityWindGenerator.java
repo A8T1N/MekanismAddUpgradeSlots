@@ -13,7 +13,6 @@ import mekanismaddupgradeslots.MekanismAUSUtils;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,7 +49,7 @@ public abstract class MixinTileEntityWindGenerator extends TileEntityGenerator i
     public void init(CallbackInfo ci) {
         TileEntityWindGenerator self = (TileEntityWindGenerator) (Object) this;
         // インベントリを拡張（サイズ2: スロット0: エネルギー, 1:アップグレード）
-        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(NEW_SLOTS.length, new ItemStack((Item)null));
+        NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(NEW_SLOTS.length, new ItemStack((Item) null));
         // 既存のスロット0のアイテムをコピー
         newInventory.set(0, self.inventory.get(0));
         self.inventory = newInventory;

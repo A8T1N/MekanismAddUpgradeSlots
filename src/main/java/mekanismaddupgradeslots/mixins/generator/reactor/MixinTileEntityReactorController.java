@@ -1,13 +1,16 @@
-package mekanismaddupgradeslots.mixins.generator.solar;
+package mekanismaddupgradeslots.mixins.generator.reactor;
 
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.component.TileComponentUpgrade;
+import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NonNullListSynchronized;
-import mekanism.generators.common.tile.TileEntityGenerator;
-import mekanism.generators.common.tile.TileEntitySolarGenerator;
+import mekanism.generators.common.MekanismGenerators;
+import mekanism.generators.common.block.states.BlockStateReactor;
+import mekanism.generators.common.tile.reactor.TileEntityReactorBlock;
+import mekanism.generators.common.tile.reactor.TileEntityReactorController;
 import mekanismaddupgradeslots.MekanismAUSUtils;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,31 +21,27 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 
-@Mixin(TileEntitySolarGenerator.class)
-public abstract class MixinTileEntitySolarGenerator extends TileEntityGenerator implements IUpgradeTile {
+@Mixin(TileEntityReactorController.class)
+public abstract class MixinTileEntityReactorController extends TileEntityReactorBlock implements IUpgradeTile {
+
     @Unique
     private TileComponentUpgrade upgradeComponent; // アップグレードを追加するクラス
-
-    public MixinTileEntitySolarGenerator(String soundPath, String name, double maxEnergy, double out) {
-        super(soundPath, name, maxEnergy, out);
-    }
 
     /* ==============================================
      * アップグレードスロット関連
      * ============================================== */
 
-    @Inject(method = "<init>(Ljava/lang/String;DD)V", at = @At("TAIL"))
-    private void init(String name, double maxEnergy, double output, CallbackInfo ci) {
-        TileEntitySolarGenerator self = (TileEntitySolarGenerator) (Object) this;
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void init(CallbackInfo ci) {
+        TileEntityReactorController self = (TileEntityReactorController) (Object) this;
         NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(2, new ItemStack((Item) null));
         newInventory.set(0, self.inventory.get(0));
         self.inventory = newInventory;
-        upgradeComponent = new TileComponentUpgrade(self, 1);
-        upgradeComponent.setSupported(Upgrade.SPEED);
+        // THREADアップグレード、エネルギーアップグレードにに対応
+        this.upgradeComponent = new TileComponentUpgrade(this, 1, Upgrade.THREAD, MekanismGenerators.proxy, BlockStateReactor.ReactorBlockType.REACTOR_CONTROLLER.blockType.getBlock(), BlockStateReactor.ReactorBlockType.REACTOR_CONTROLLER.meta, BlockStateReactor.ReactorBlockType.REACTOR_CONTROLLER.guiId);
         upgradeComponent.setSupported(Upgrade.ENERGY);
     }
 
@@ -54,10 +53,15 @@ public abstract class MixinTileEntitySolarGenerator extends TileEntityGenerator 
         return upgradeComponent;
     }
 
+    @Shadow
+    public boolean isFormed() {
+        return false;
+    }
+
     @Nonnull
     @Override
     public int[] getSlotsForFace(@Nonnull EnumFacing side) {
-        return new int[]{0, 1};
+        return this.isFormed() ? new int[]{0, 1} : InventoryUtils.EMPTY;
     }
 
     /*　=========================
@@ -73,28 +77,6 @@ public abstract class MixinTileEntitySolarGenerator extends TileEntityGenerator 
         }
     }
 
-    /* =========================
-     *  スピードアップグレード 対応
-     * ========================= */
-
-
-    @Inject(method = "getProduction", at = @At("RETURN"), cancellable = true, remap = false)
-    private void modifyProduction(CallbackInfoReturnable<Double> cir) {
-        // Get the original production value
-        double originalProduction = cir.getReturnValue();
-        // Multiply by 100 as requested
-        cir.setReturnValue(originalProduction * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent));
-    }
-
-    @Shadow
-    public double getProduction() {
-        return 0;
-    }
-
-    public String getEfficiencyStr() {
-        return String.format("%2.0f", (getProduction() / getMaxOutput()) * 100);
-    }
-
     /* ==============================================
      * エネルギーアップグレードによる排出RF量の動的変更
      * ============================================== */
@@ -103,4 +85,5 @@ public abstract class MixinTileEntitySolarGenerator extends TileEntityGenerator 
     public double getMaxOutput() {
         return MekanismConfig.current().generators.solarGeneration.val() * 2 * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.ENERGY, this.upgradeComponent);
     }
+
 }

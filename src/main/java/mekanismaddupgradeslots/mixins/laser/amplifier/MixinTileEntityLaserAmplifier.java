@@ -1,7 +1,9 @@
 package mekanismaddupgradeslots.mixins.laser.amplifier;
 
+import mekanism.common.Mekanism;
 import mekanism.common.Upgrade;
 import mekanism.common.base.IUpgradeTile;
+import mekanism.common.block.states.BlockStateMachine;
 import mekanism.common.tile.component.TileComponentUpgrade;
 import mekanism.common.tile.laser.TileEntityLaserAmplifier;
 import mekanism.common.tile.prefab.TileEntityContainerBlock;
@@ -48,7 +50,7 @@ public abstract class MixinTileEntityLaserAmplifier extends TileEntityContainerB
         NonNullListSynchronized<ItemStack> newInventory = NonNullListSynchronized.withSize(1, new ItemStack((Item) null));
         self.inventory = newInventory;
         upgradeComponent = new TileComponentUpgrade(self, 0); // インベントリ外で管理
-        upgradeComponent.setSupported(Upgrade.SPEED);
+        this.upgradeComponent = new TileComponentUpgrade(this, 0, Upgrade.THREAD, Mekanism.proxy, BlockStateMachine.MachineBlock.MACHINE_BLOCK_2.getBlock(), BlockStateMachine.MachineType.LASER_AMPLIFIER.meta, BlockStateMachine.MachineType.LASER_AMPLIFIER.guiId);
         upgradeComponent.setSupported(Upgrade.ENERGY);
     }
 
@@ -104,11 +106,10 @@ public abstract class MixinTileEntityLaserAmplifier extends TileEntityContainerB
     }
 
     /* =========================
-     *  スピードアップグレード 対応
+     *  THREADアップグレード 対応
      * ========================= */
 
     public void receiveLaserEnergy(double energy, EnumFacing side) {
-        this.setEnergy(this.getEnergy() + energy * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.SPEED, this.upgradeComponent));
+        this.setEnergy(this.getEnergy() + energy * MekanismAUSUtils.getUpgradeMultiplier(Upgrade.THREAD, this.upgradeComponent));
     }
-
 }

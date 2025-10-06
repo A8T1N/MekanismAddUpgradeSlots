@@ -18,9 +18,10 @@
     "laser.amplifier.MixinTileEntityLaserAmplifier",
     "laser.amplifier.MixinGuiLaserAmplifier",
     "laser.tractorbeam.MixinTileEntityLaserTractorBeam",
-    "laser.tractorbeam.MixinGuiLaserTractorBeam"
-
-
+    "laser.tractorbeam.MixinGuiLaserTractorBeam",
+    "generator.reactor.MixinGuiReactorController",
+    "generator.reactor.MixinTileEntityReactorController",
+    "generator.reactor.MixinFusionReactor"
   ],
   "client": [],
   "server": []

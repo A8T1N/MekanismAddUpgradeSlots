@@ -53,5 +53,4 @@ public final class MekanismAUSUtils {
                 ? (float) Math.pow(10.0, installCount / 8) * multipliers[installCount % 8]
                 : multipliers[Math.min(installCount, 8)];
     }
-
 }
